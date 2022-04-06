@@ -2,23 +2,6 @@ import 'package:flutter/gestures.dart';
 import 'handler/app_event_handler.dart';
 import 'model/hit_test_wrapper.dart';
 
-/* 
-（1）按照WidgetsFlutterBinding的dispatchEvent方法的源代码，
-在遍历HitTestResult的每一个entry的过程中，
-会调用entry.target.handleEvent方法。
-
-（2）目标就是hook掉HitTestTarget的handleEvent方法，
-再结合我们自己实现的竞技场管理器对象的协助，可以建立起target与手势之间的对应关系。
-
-（3）首先，将HitTestTarget进行包装，以便于hook掉handleEvent方法。
-
-（4）其次，将HitTestEntry进行包装，令其target属性返回我们的HitTestTargetHook对象。
-
-（5）最后，将HitTestResult进行包装，
-另其path属性返回我们临时创建的HitTestEntryWrapper对象列表
-（这样刚好不会影响到竞技场中缓存的HitTestResult对象）。
-*/
-
 /// 重载手势竞争管理类的add，拦截加入的成员，包装成自定义的成员对象，记录事件、target、winner
 class MonitorGestureArenaManager extends GestureArenaManager {
   PointerEvent? _currentEvent;

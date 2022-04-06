@@ -8,14 +8,15 @@ import 'monitor_root_widget.dart';
 
 /// 更换runApp入口，使用自定义子类重载WidgetsFlutterBinding，用于记录事件派发
 void runAndObserveApp(Widget app,
-        {Function()? beforeAttach, Function(EventInfo event)? eventListener}) =>
+        {Function(MonitorWidgetsFlutterBinding monitor)? beforeAttach,
+        Function(EventInfo event)? eventListener}) =>
     MonitorWidgetsFlutterBinding._run(app, beforeAttach: beforeAttach);
 
 /// MonitorWidgetsFlutterBinding
 /// 记录应用事件
 class MonitorWidgetsFlutterBinding extends WidgetsFlutterBinding {
   // 开放给外层其他需要包装根节点的需求使用
-  Function()? _beforeAttach;
+  Function(MonitorWidgetsFlutterBinding monitor)? _beforeAttach;
 
   // 这个函数必须要在WidgetsFlutterBinding的ensureInitialized之前执行，确保其他代码没有预先调用了它
   static WidgetsBinding ensureInitialized() {
@@ -35,7 +36,7 @@ class MonitorWidgetsFlutterBinding extends WidgetsFlutterBinding {
   @override
   void attachRootWidget(Widget rootWidget) {
     if (_beforeAttach != null) {
-      _beforeAttach!();
+      _beforeAttach!(this);
     }
     rootWidget = MonitorRootWidget(
       child: rootWidget,
@@ -57,7 +58,8 @@ class MonitorWidgetsFlutterBinding extends WidgetsFlutterBinding {
   }
 
   /// 更换runApp入口，使用自定义子类重载WidgetsFlutterBinding，用于记录事件派发
-  static void _run(Widget app, {Function()? beforeAttach}) {
+  static void _run(Widget app,
+      {Function(MonitorWidgetsFlutterBinding monitor)? beforeAttach}) {
     MonitorWidgetsFlutterBinding.ensureInitialized()
         as MonitorWidgetsFlutterBinding
       .._beforeAttach = beforeAttach
